@@ -2,10 +2,22 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/product');
 const mongoose = require("mongoose");
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, './uploads/');
+    },
+    filename: function(req, file, cb) {
+        cb(null, new Date().toISOString() + file.originalname);
+    }
+});
+
+const upload = multer({storage: storage});
 
 router.get('/', (req, res, next) => {
     Product.find()
-    .select('name price _id')
+    .select('name price _id amount producer description status date img')
     .exec()
     .then(docs => {
         const response = {
@@ -20,11 +32,18 @@ router.get('/', (req, res, next) => {
     });
 });
 
-router.post('/', (req, res, next) => {
+router.post('/', upload.single('img'), (req, res, next) => {
+    console.log(req.file);
     const product = new Product({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
-        price: req.body.price
+        price: req.body.price,
+        amount: req.body.amount,
+        producer: req.body.producer,
+        description: req.body.description,
+        status: req.body.status,
+        date: req.body.date,
+        img: req.file.path
     });
     product.save()
     .then(result => {
@@ -32,9 +51,15 @@ router.post('/', (req, res, next) => {
         res.status(201).json({
             message: 'POST just work!',
             createdProduct: {
+                _id: result._id,
                 name: result.name,
                 price: result.price,
-                _id: result._id
+                amount: result.amount,
+                producer: result.producer,
+                description: result.description,
+                status: result.status,
+                date: result.date,
+                img: result.img
             }
         });
     })
@@ -47,7 +72,7 @@ router.post('/', (req, res, next) => {
 router.get('/:productId', (req,res,next) => {
     const id = req.params.productId;
     Product.findById(id)
-    .select('name price _id')
+    .select('name price _id amount producer description status date img')
     .exec()
     .then(doc => {
         console.log(doc);

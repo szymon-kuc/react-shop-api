@@ -5,11 +5,11 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const productRoutes = require('./api/routes/products');
-const orderRoutes = require('./api/routes/orders');
 
 mongoose.connect('mongodb+srv://szymon:Szymon12329@cluster0-xuvj1.mongodb.net/test?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use(morgan('dev'));
+app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
@@ -25,7 +25,6 @@ app.use((req, res, next) => {
 });
 
 app.use('/products', productRoutes);
-app.use('/orders', orderRoutes);
 
 app.use((req,res,next) => {
     const error = new Error('Not found');
