@@ -43,7 +43,8 @@ router.post('/', upload.single('img'), (req, res, next) => {
         description: req.body.description,
         status: req.body.status,
         date: req.body.date,
-        img: req.file.path
+        img: req.file.path,
+        category: req.file.category
     });
     product.save()
     .then(result => {
@@ -59,7 +60,8 @@ router.post('/', upload.single('img'), (req, res, next) => {
                 description: result.description,
                 status: result.status,
                 date: result.date,
-                img: result.img
+                img: result.img,
+                category: result.category
             }
         });
     })
